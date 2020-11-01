@@ -28,6 +28,7 @@ provider:
 
 plugins:
   - serverless-webpack
+  - serverless-jest-plugin
 
 custom:
   webpack:
