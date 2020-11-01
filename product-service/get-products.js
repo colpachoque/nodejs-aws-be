@@ -1,8 +1,6 @@
-'use strict';
-// import productList from "./productList.json";
-const productList = require('./productList.json');
+import productList from "./productList.json";
 
-module.exports.getProductsList = async event => {
+export const getProductsList = async event => {
   return {
     statusCode: 200,
     headers: {

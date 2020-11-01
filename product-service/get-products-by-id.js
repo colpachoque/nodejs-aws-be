@@ -1,8 +1,6 @@
-'use strict';
-// import productList from "./productList.json";
-const productList = require('./productList.json')
+import productList from "./productList.json";
 
-module.exports.getProductsById = async event => {
+export const getProductsById = async event => {
   const {productId} = event.pathParameters,
     product = productList.find(p => p.id === productId);
 
@@ -27,3 +25,4 @@ module.exports.getProductsById = async event => {
     body: JSON.stringify(product)
   };
 };
+
