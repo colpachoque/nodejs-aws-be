@@ -26,6 +26,7 @@ provider:
   stage: dev
   region: eu-west-1
 
+
 plugins:
   - serverless-webpack
   - serverless-jest-plugin
@@ -50,4 +51,11 @@ functions:
       - http:
           path: products/{productId}
           method: get
+          cors: true
+  createProduct:
+    handler: create-product.createProduct
+    events:
+      - http:
+          path: products
+          method: post
           cors: true
