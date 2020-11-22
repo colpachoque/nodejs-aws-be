@@ -25,7 +25,9 @@ provider:
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
-
+  environment:
+    SQS_URL:
+      Ref: catalogItemsQueue
 
 plugins:
   - serverless-webpack
@@ -35,6 +37,17 @@ custom:
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: true
+
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+  Outputs:
+    SQSUrl:
+      Value:
+        Ref: catalogItemsQueue
 
 functions:
   getProductsList:
@@ -59,3 +72,12 @@ functions:
           path: products
           method: post
           cors: true
+  catalogBatchProcess:
+    handler: catalog-batch-process.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - catalogItemsQueue
+              - Arn
