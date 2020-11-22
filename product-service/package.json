@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Serverless product service",
   "dependencies": {
+    "aws-sdk": "^2.797.0",
     "pg": "^8.4.2"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 import {Client} from 'pg';
+import AWS from 'aws-sdk';
 
-const {PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD} = process.env,
+const {PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD, SNS_URL} = process.env,
   dbOptions = {
     host: PG_HOST || 'localhost', 
     port: PG_PORT || 5432,
@@ -15,7 +16,8 @@ const {PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD} = process.env,
 
 export const catalogBatchProcess = async (event, context, callback) => {
 	const products = event.Records.map(({ body }) => JSON.parse(body)),
-		client = new Client(dbOptions);
+		client = new Client(dbOptions),
+		sns = new AWS.SNS({ region: 'eu-west-1'})
 
 	console.log(products);
 
@@ -34,6 +36,14 @@ export const catalogBatchProcess = async (event, context, callback) => {
 		}
 
 		await client.query('COMMIT');
+
+		sns.publish({
+			Subject: 'Products from uploaded file were created in the database',
+			Message: 'Hi! There were new products created from csv file. Take a look!',
+			TopicArn: SNS_URL
+		}, () => {
+			console.log('Email was sent to me');
+		});
 	} catch (err) {
 		console.log('Error creating items in table', err);
 		await client.query('ROLLBACK');

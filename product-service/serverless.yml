@@ -25,9 +25,22 @@ provider:
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'sqs:*'
+      Resource:
+        - Fn::GetAtt: [catalogItemsQueue, Arn]
+    - Effect: 'Allow'
+      Action:
+        - 'sns:*'
+      Resource:
+        Ref: SNSTopic
   environment:
     SQS_URL:
       Ref: catalogItemsQueue
+    SNS_URL:
+      Ref: SNSTopic
 
 plugins:
   - serverless-webpack
@@ -44,6 +57,17 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: catalogItemsQueue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: krakoryak@gmail.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
   Outputs:
     SQSUrl:
       Value:
