@@ -46,6 +46,10 @@ functions:
               querystrings:
                 name: true
           cors: true
+          authorizer:
+            arn: arn:aws:lambda:eu-west-1:517465834650:function:authorization-service-dev-basic-authorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
   importSecondFileParser:
     handler: import-file-parser.importSecondFileParser
     events:
