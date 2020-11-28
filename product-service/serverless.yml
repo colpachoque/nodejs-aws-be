@@ -25,7 +25,22 @@ provider:
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
-
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'sqs:*'
+      Resource:
+        - Fn::GetAtt: [catalogItemsQueue, Arn]
+    - Effect: 'Allow'
+      Action:
+        - 'sns:*'
+      Resource:
+        Ref: SNSTopic
+  environment:
+    SQS_URL:
+      Ref: catalogItemsQueue
+    SNS_URL:
+      Ref: SNSTopic
 
 plugins:
   - serverless-webpack
@@ -35,6 +50,28 @@ custom:
   webpack:
     webpackConfig: 'webpack.config.js'
     includeModules: true
+
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: krakoryak@gmail.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+  Outputs:
+    SQSUrl:
+      Value:
+        Ref: catalogItemsQueue
 
 functions:
   getProductsList:
@@ -59,3 +96,12 @@ functions:
           path: products
           method: post
           cors: true
+  catalogBatchProcess:
+    handler: catalog-batch-process.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - catalogItemsQueue
+              - Arn

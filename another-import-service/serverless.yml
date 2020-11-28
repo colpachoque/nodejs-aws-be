@@ -25,6 +25,11 @@ provider:
         - 's3:*'
       Resource: 
         - 'arn:aws:s3:::colpachoques-bucket-imported/*'
+    - Effect: 'Allow'
+      Action:
+        - 'sqs:*'
+      Resource:
+        - 'arn:aws:sqs:eu-west-1:517465834650:catalogItemsQueue'
 
 functions:
   importProductsFile:

@@ -31,7 +31,23 @@ export const importSecondFileParser = async event => {
     for (const record of event.Records) {
         console.log(record.s3.object.key);
 
-        const data = await collectDataForLogging(record.s3.object.key);
+        const data = await collectDataForLogging(record.s3.object.key),
+            sqs = new AWS.SQS();
+
+
+        for (const product of data) {
+            try {
+                const res = await sqs.sendMessage({
+                    QueueUrl: 'https://sqs.eu-west-1.amazonaws.com/517465834650/catalogItemsQueue',
+                    MessageBody: JSON.stringify(product)
+                }).promise();
+        
+                console.log(res);
+            } catch(e) {
+                console.log('error from sqs send msg', e);
+            }
+        }
+
         console.log('data ', data);
         
         /* Copy */
