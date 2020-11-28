@@ -38,7 +38,7 @@ export const importSecondFileParser = async event => {
         for (const product of data) {
             try {
                 const res = await sqs.sendMessage({
-                    QueueUrl: 'https://sqs.eu-west-1.amazonaws.com/517465834650/catalogItemsQueue',
+                    QueueUrl: process.env.SQS_URL,
                     MessageBody: JSON.stringify(product)
                 }).promise();
         

@@ -30,6 +30,9 @@ provider:
         - 'sqs:*'
       Resource:
         - 'arn:aws:sqs:eu-west-1:517465834650:catalogItemsQueue'
+  environment:
+    SQS_URL:
+      Fn::ImportValue: SQSUrl
 
 functions:
   importProductsFile:
