@@ -72,6 +72,13 @@ resources:
     SQSUrl:
       Value:
         Ref: catalogItemsQueue
+      Export:
+        Name: SQSUrl
+    SQSArn:
+      Value:
+        Fn::GetAtt:
+          - catalogItemsQueue
+          - Arn
 
 functions:
   getProductsList:

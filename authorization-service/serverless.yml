@@ -1,0 +1,25 @@
+service:
+  name: authorization-service
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+frameworkVersion: '2'
+
+# Add the serverless-webpack plugin
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+
+functions:
+  basic-authorizer:
+    handler: basic-authorizer.basicAuthorizer
+    events:
+      - http:
+          path: check
+          method: get
+          cors: true

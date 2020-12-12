@@ -30,6 +30,29 @@ provider:
         - 'sqs:*'
       Resource:
         - 'arn:aws:sqs:eu-west-1:517465834650:catalogItemsQueue'
+  environment:
+    SQS_URL:
+      Fn::ImportValue: SQSUrl
+resources:
+    Resources:
+      GatewayResponseAccessDenied: 
+        Type: AWS::ApiGateway::GatewayResponse
+        Properties: 
+          RestApiId: 
+            Ref: ApiGatewayRestApi
+          ResponseType: ACCESS_DENIED
+          ResponseParameters:
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'"
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
+      GatewayResponseUnauthorized:
+        Type: 'AWS::ApiGateway::GatewayResponse'
+        Properties:
+          RestApiId:
+            Ref: ApiGatewayRestApi
+          ResponseType: UNAUTHORIZED
+          ResponseParameters:
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'"
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'*'"
 
 functions:
   importProductsFile:
@@ -43,6 +66,10 @@ functions:
               querystrings:
                 name: true
           cors: true
+          authorizer:
+            arn: arn:aws:lambda:eu-west-1:517465834650:function:authorization-service-dev-basic-authorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
   importSecondFileParser:
     handler: import-file-parser.importSecondFileParser
     events:
