@@ -1,6 +1,8 @@
 require('dotenv').config();
 
 const express = require('express'),
+    NodeCache = require('node-cache'),
+    myCache = new NodeCache({stdTTL: 120, checkperiod: 120}),
     axios = require('axios').default,
     PORT = process.env.PORT || 3001,
     app = express();
@@ -21,6 +23,14 @@ app.all('/*', (req, res) => {
         res.status(502).json({error: 'Cannot process request'});
     }
 
+    if (method.toUpperCase() === 'GET') {
+        if (myCache.has(originalUrl)) {
+            res.json(myCache.get(originalUrl));
+
+            return;
+        }
+    }
+
     const axiosConfig = {
         method,
         url: `${targetUrl}${originalUrl}`,
@@ -29,6 +39,7 @@ app.all('/*', (req, res) => {
 
     axios(axiosConfig).then(response => {
         console.log('response', response);
+        myCache.set(originalUrl, response.data);
         res.json(response.data);
     }).catch(e => {
         console.log('in catch block');
